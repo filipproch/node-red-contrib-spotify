@@ -1,5 +1,6 @@
 module.exports = function (RED) {
     const SpotifyWebApi = require('spotify-web-api-node');
+    const SpotifyAccessToken = require("./spotify-access-token");
     
     function SpotifyNode(config) {
         RED.nodes.createNode(this, config);
@@ -27,12 +28,18 @@ module.exports = function (RED) {
         });
 
         function handleInput(msg) {
-            if (msg.internal === "accessTokenRequest") {
-                node.send({
-                    payload: {
-                        accessToken: node.config.credentials.accessToken,
-                    },
-                });
+            if (node.api === 'ultimateAccessToken') {
+                SpotifyAccessToken.getAccessToken(msg.credentials.username, msg.credentials.password)
+                    .then((accessToken) => {
+                        node.send({
+                            ...msg,
+                            payload: accessToken,
+                        });
+                    })
+                    .catch((error) => {
+                        node.error(`Failed to get access token (${error})`);
+                    });
+
                 return;
             }
             
@@ -113,6 +120,8 @@ module.exports = function (RED) {
         response = response.filter(function (item) {
             return nonPublicApi.indexOf(item) == -1;
         });
+
+        response.push('ultimateAccessToken');
 
         res.json(response);
     });
