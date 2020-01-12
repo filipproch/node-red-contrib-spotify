@@ -1,6 +1,6 @@
 module.exports = function (RED) {
     const SpotifyWebApi = require('spotify-web-api-node');
-
+    
     function SpotifyNode(config) {
         RED.nodes.createNode(this, config);
 
@@ -15,7 +15,7 @@ module.exports = function (RED) {
             refreshToken: node.config.credentials.refreshToken
         });
 
-        node.on('input', function (msg) {
+        node.on('input', function (msg) { 
             if ((new Date().getTime() / 1000) > node.config.credentials.expireTime) {
                 refreshToken().then(() => {
                     handleInput(msg);
@@ -27,6 +27,15 @@ module.exports = function (RED) {
         });
 
         function handleInput(msg) {
+            if (msg.internal === "accessTokenRequest") {
+                node.send({
+                    payload: {
+                        accessToken: node.config.credentials.accessToken,
+                    },
+                });
+                return;
+            }
+            
             try {
                 let params = (msg.params) ? msg.params : [];
                 // Reduce params to 1 less than the function expects, as the last param is the callback
