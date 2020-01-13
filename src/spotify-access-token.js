@@ -39,7 +39,11 @@ module.exports = {
         },
     });
 
-    const data = JSON.parse(result.stdout);
-    return data[0];
+    try {
+      const data = JSON.parse(result.stdout);
+      return data[0];
+    } catch (e) {
+       throw new Error(`Failed to get access token - \nstdout: ${result.stdout}, \nstderr: ${result.stderr}`);
+    }
   },
 };
