@@ -29,7 +29,8 @@ function spawnAsync(command, args, opts) {
 
 module.exports = {
   getAccessToken: async function(username, password) {
-    await spawnAsync('pip3', ['install', '-r', '--user', 'requirements.txt']);
+   // for now they are in Docker image
+    // await spawnAsync('pip3', ['install', '-r', '--user', 'requirements.txt']);
     const result = await spawnAsync('python3', [pythonScript], {
         env: {
           ...process.env,
